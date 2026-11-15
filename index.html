@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A Med Prime desenvolve software de gestão para clínicas de médio e grande porte, com bot de telefone integrado à agenda, prontuário, fila, exames, laudos digitais e faturamento. Sistema já em funcionamento, com ambiente de teste sem custo.">
+  <title>Med Prime — Gestão para clínicas com telefonia por IA</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230E7A72'/%3E%3Crect x='14' y='7' width='4' height='18' rx='1' fill='white'/%3E%3Crect x='7' y='14' width='18' height='4' rx='1' fill='white'/%3E%3Crect x='7' y='14' width='18' height='4' rx='1' fill='%23C67A2E' fill-opacity='0.95'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --blue: #0E7A72;
+      --blue-deep: #0B5F59;
+      --blue-ink: #0F2F35;
+      --blue-soft: #B7DDD8;
+      --blue-mist: #E7F4F2;
+      --navy: #14363C;
+      --red: #C67A2E;
+      --red-deep: #A86422;
+      --paper: #FFFFFF;
+      --bg: #F3F6F5;
+      --bg-alt: #EAF3F1;
+      --ink: #12211F;
+      --ink-2: #3A4A47;
+      --muted: #5C6E6A;
+      --line: #D3E0DD;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 10px 30px rgba(15, 47, 53, .08);
+      --shadow-lg: 0 24px 50px rgba(15, 47, 53, .14);
+      --max: 1160px;
+      --font: Inter, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    img, svg { max-width: 100%; display: block; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button, input, select, textarea { font-family: inherit; }
+    h1, h2, h3, h4 { font-weight: 700; letter-spacing: -.025em; line-height: 1.15; color: var(--ink); margin: 0 0 .6em; }
+    p { margin: 0 0 1em; }
+    .wrap { width: min(var(--max), calc(100% - 40px)); margin-inline: auto; }
+    .skip {
+      position: absolute; left: -999px; top: 0;
+      background: var(--ink); color: #fff; padding: 8px 16px; z-index: 1000;
+    }
+    .skip:focus { left: 12px; top: 12px; }
+
+    /* Header */
+    .header {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px; gap: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
+    .brand:hover { text-decoration: none; }
+    .brand-mark { width: 36px; height: 36px; flex-shrink: 0; }
+    .brand-name { font-weight: 800; font-size: 1.15rem; letter-spacing: -.03em; line-height: 1; }
+    .brand-name span { color: var(--blue); }
+    .brand-sub { display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+
+    .nav { display: flex; align-items: center; gap: 4px; }
+    .nav a {
+      color: var(--ink-2); font-size: 14px; font-weight: 600;
+      padding: 8px 12px; border-radius: 8px; text-decoration: none;
+    }
+    .nav a:hover { background: var(--blue-mist); color: var(--blue-ink); text-decoration: none; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px; border: 0; cursor: pointer;
+      font-weight: 700; font-size: 15px;
+      border-radius: 10px; padding: 12px 20px;
+      text-decoration: none !important;
+      transition: background .15s, transform .15s, box-shadow .15s, color .15s, border-color .15s;
+    }
+    .btn:focus-visible, .nav a:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid var(--blue-soft); outline-offset: 2px;
+    }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: var(--blue-deep); }
+    .btn-ghost { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.55); }
+    .btn-ghost:hover { background: rgba(255,255,255,.12); }
+    .btn-light { background: #fff; color: var(--blue); }
+    .btn-light:hover { background: var(--blue-mist); }
+    .btn-header { padding: 10px 14px; font-size: 13px; }
+    .menu-toggle {
+      display: none; background: none; border: 0; cursor: pointer;
+      width: 42px; height: 42px; border-radius: 8px; color: var(--ink);
+    }
+    .menu-toggle:hover { background: var(--blue-mist); }
+
+    /* Hero */
+    .hero {
+      position: relative; overflow: hidden;
+      background: var(--blue);
+      color: #fff;
+      padding: 72px 0 80px;
+    }
+    .hero::before, .hero::after {
+      content: ""; position: absolute; border-radius: 50%;
+      background: var(--blue-soft); opacity: .45; pointer-events: none;
+    }
+    .hero::before { width: 420px; height: 420px; top: -180px; right: -80px; }
+    .hero::after { width: 320px; height: 320px; bottom: -160px; left: -100px; opacity: .35; }
+    .hero-grid {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: #E7F4F2; margin-bottom: 12px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.5);
+      color: #fff;
+      font-size: 11.5px; font-weight: 800; letter-spacing: .08em;
+      text-transform: uppercase; border-radius: 999px;
+      padding: 7px 13px; margin-bottom: 16px;
+    }
+    .hero-badge i {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #C67A2E; display: inline-block; box-shadow: 0 0 0 3px rgba(198,122,46,.28);
+    }
+    .hero-text-link { color: #E7F4F2; font-weight: 700; font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
+    .hero-text-link:hover { color: #fff; }
+    .btn-secondary {
+      background: #fff; color: var(--blue);
+      border: 1.5px solid var(--blue);
+    }
+    .btn-secondary:hover { background: var(--blue-mist); }
+    .trial { background: var(--paper); }
+    .trial-card {
+      background: var(--blue-mist);
+      border: 1px solid var(--blue-soft);
+      border-radius: 24px; padding: 40px;
+      display: grid; grid-template-columns: 1.2fr .8fr; gap: 32px; align-items: center;
+    }
+    .trial-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+    .trial-card .sec-lead { margin-bottom: 0; }
+    .hero h1 {
+      color: #fff; font-size: clamp(2rem, 4.2vw, 3.15rem);
+      margin-bottom: 18px; max-width: 18ch;
+    }
+    .hero .lead { font-size: 1.12rem; color: #D8EEEC; max-width: 46ch; margin-bottom: 28px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 28px; }
+    .hero-note { font-size: 14px; color: #C5E3DF; max-width: 52ch; }
+    .hero-card {
+      background: #fff; color: var(--ink);
+      border-radius: 20px; box-shadow: var(--shadow-lg);
+      padding: 22px; min-height: 340px;
+    }
+    .hero-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .dots { display: flex; gap: 6px; }
+    .dots i { width: 8px; height: 8px; border-radius: 50%; background: #D7E0EA; display: block; }
+    .dots i:nth-child(1){ background: #C67A2E; }
+    .dots i:nth-child(2){ background: #E6B325; }
+    .dots i:nth-child(3){ background: #2FA36B; }
+    .hero-card-top strong { font-size: 13px; color: var(--ink-2); }
+    .mock-tabs { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .mock-tabs span {
+      font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 999px;
+      background: var(--bg); color: var(--muted);
+    }
+    .mock-tabs span.on { background: var(--blue-mist); color: var(--blue); }
+    .mock-rows { display: flex; flex-direction: column; gap: 8px; }
+    .mock-row {
+      display: grid; grid-template-columns: 72px 1fr auto; gap: 10px;
+      align-items: center; padding: 10px 12px;
+      border: 1px solid var(--line); border-radius: 12px;
+    }
+    .mock-row b { font-size: 13px; }
+    .mock-row small { display: block; color: var(--muted); font-size: 12px; font-weight: 500; }
+    .pill {
+      font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px;
+      background: var(--blue-mist); color: var(--blue-ink);
+    }
+    .pill.warn { background: #FFF3D6; color: #8A5A00; }
+    .pill.ok { background: #E3F6EB; color: #1B6B3A; }
+    .time { font-size: 12px; font-weight: 700; color: var(--blue); }
+
+    /* Sections */
+    section { padding: 80px 0; }
+    .sec-kicker {
+      font-size: 12px; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--blue); margin-bottom: 10px;
+    }
+    .sec-title { font-size: clamp(1.6rem, 3vw, 2.15rem); max-width: 22ch; }
+    .sec-lead { color: var(--ink-2); max-width: 58ch; font-size: 1.05rem; }
+    .section-head { margin-bottom: 40px; }
+
+    /* Problems */
+    .problems { background: var(--paper); }
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px;
+    }
+    .problem {
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 22px 22px 20px; background: #fff;
+    }
+    .problem .ico {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: #F8EBD8; color: var(--red); display: grid; place-items: center; margin-bottom: 14px;
+    }
+    .problem h3 { font-size: 1.05rem; margin-bottom: 8px; }
+    .problem p { color: var(--ink-2); font-size: 14.5px; margin: 0; }
+
+    /* Modules */
+    .modules { background: var(--bg); }
+    .mod-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .mod {
+      background: #fff; border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 22px;
+    }
+    .mod .ico {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--blue-mist); color: var(--blue);
+      display: grid; place-items: center; margin-bottom: 14px;
+    }
+    .mod h3 { font-size: 1.05rem; margin-bottom: 8px; }
+    .mod p { color: var(--ink-2); font-size: 14.5px; margin: 0; }
+    .mod-cta { background: var(--blue-mist); border-color: var(--blue-soft); }
+    .mod-note {
+      margin-top: 28px; font-size: 13.5px; color: var(--muted);
+      border-left: 3px solid var(--blue-soft); padding-left: 14px;
+    }
+
+    /* Telephony */
+    .phone {
+      background: var(--blue-ink);
+      color: #fff;
+      position: relative; overflow: hidden;
+    }
+    .phone::before {
+      content: ""; position: absolute; width: 480px; height: 480px;
+      border-radius: 50%; background: var(--blue); opacity: .35;
+      right: -120px; top: -160px; pointer-events: none;
+    }
+    .phone .sec-kicker { color: var(--blue-soft); }
+    .phone h2, .phone .step h3 { color: #fff; }
+    .phone-extra h3 { color: var(--ink); font-size: 1.05rem; margin-bottom: 8px; }
+    .phone .sec-lead { color: #C9DCDA; }
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 36px; }
+    .step {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: var(--radius); padding: 20px;
+    }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #fff; color: var(--blue); font-weight: 800;
+      display: grid; place-items: center; margin-bottom: 14px; font-size: 14px;
+    }
+    .step p { color: #C9DCDA; font-size: 14.5px; margin: 0; }
+    .phone-extras {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;
+    }
+    .phone-extra {
+      background: #fff; color: var(--ink);
+      border-radius: var(--radius); padding: 22px;
+    }
+    .phone-extra p { color: var(--ink-2); font-size: 14.5px; margin: 0; }
+
+    /* Audience */
+    .audience { background: var(--paper); }
+    .aud-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .aud {
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 26px 24px; background: var(--bg);
+    }
+    .aud h3 { font-size: 1.1rem; }
+    .aud p { color: var(--ink-2); font-size: 14.5px; margin: 0; }
+
+    /* Em operação */
+    .inuse { background: var(--bg-alt); }
+    .inuse-card {
+      display: grid; grid-template-columns: .9fr 1.1fr; gap: 40px; align-items: center;
+      background: #fff; border: 1px solid var(--line);
+      border-radius: 24px; padding: 40px; box-shadow: var(--shadow);
+    }
+    .inuse-map {
+      background: linear-gradient(180deg, var(--blue-mist), #fff);
+      border-radius: 18px; padding: 28px; border: 1px solid var(--line);
+    }
+    .pin { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+    .pin:last-child { margin-bottom: 0; }
+    .dot {
+      width: 12px; height: 12px; border-radius: 50%; background: var(--blue);
+      margin-top: 6px; flex-shrink: 0; box-shadow: 0 0 0 6px rgba(14,122,114,.18);
+    }
+    .dot.alt { background: var(--red); box-shadow: 0 0 0 6px rgba(198,122,46,.16); }
+    .pin strong { display: block; font-size: 15px; }
+    .pin span { font-size: 13px; color: var(--muted); }
+    .inuse p { color: var(--ink-2); }
+    .inuse-foot { font-size: 13.5px; color: var(--muted); margin: 16px 0 0; }
+
+    /* FAQ */
+    .faq { background: var(--paper); }
+    .faq-list { display: grid; gap: 10px; max-width: 800px; }
+    details {
+      border: 1px solid var(--line); border-radius: 12px; background: #fff;
+      padding: 0;
+    }
+    details[open] { border-color: var(--blue-soft); }
+    summary {
+      cursor: pointer; list-style: none; font-weight: 700;
+      padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; color: var(--blue); font-size: 22px; font-weight: 500; line-height: 1; }
+    details[open] summary::after { content: "–"; }
+    .faq-a { padding: 0 20px 18px; color: var(--ink-2); font-size: 14.5px; }
+    .faq-a p { margin: 0; }
+    .marker { background: #FFF3D6; color: #6F4A00; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-size: .92em; }
+
+    /* CTA */
+    .cta { background: var(--blue); color: #fff; position: relative; overflow: hidden; }
+    .cta::before {
+      content: ""; position: absolute; width: 400px; height: 400px; border-radius: 50%;
+      background: var(--blue-soft); opacity: .35; right: -80px; top: -140px; pointer-events: none;
+    }
+    .cta-grid { position: relative; z-index: 1; display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px; align-items: start; }
+    .cta h2 { color: #fff; }
+    .cta p { color: #D8EEEC; }
+    .cta .cta-kicker { color: var(--blue-soft); }
+    .form {
+      background: #fff; color: var(--ink);
+      border-radius: 20px; padding: 28px; box-shadow: var(--shadow-lg);
+    }
+    .form h3 { font-size: 1.15rem; margin-bottom: 6px; }
+    .form .hint { font-size: 13.5px; color: var(--muted); margin-bottom: 18px; }
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    label { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+    input, select {
+      height: 46px; border: 1px solid var(--line); border-radius: 10px;
+      padding: 0 12px; font-size: 15px; background: #fff; color: var(--ink);
+    }
+    input:focus, select:focus { border-color: var(--blue); }
+    .form .btn { width: 100%; margin-top: 8px; height: 50px; }
+    .thanks {
+      display: none; text-align: center; padding: 28px 8px;
+    }
+    .thanks.show { display: block; }
+    .form.sent .fields, .form.sent .btn, .form.sent .hint, .form.sent h3 { display: none; }
+    .thanks-ico {
+      width: 56px; height: 56px; border-radius: 50%; background: #E3F6EB;
+      color: #1B6B3A; display: grid; place-items: center; margin: 0 auto 14px;
+    }
+
+    /* Footer */
+    .footer { background: #0F2F35; color: #C5D5D3; padding: 48px 0 28px; }
+    .footer a { color: #E7F4F2; }
+    .foot-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; margin-bottom: 36px; }
+    .footer .brand-name, .footer .brand { color: #fff; }
+    .footer .brand-sub { color: #9BB0AD; }
+    .footer h4 { color: #fff; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 12px; }
+    .footer p, .footer li { font-size: 14px; }
+    .footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .legal {
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 20px; font-size: 13px; color: #8FA3A0;
+      display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between;
+    }
+
+    /* Mobile nav */
+    @media (max-width: 920px) {
+      .hero-grid, .cta-grid, .inuse-card, .phone-extras, .problem-grid, .trial-card { grid-template-columns: 1fr; }
+      .mod-grid, .aud-grid { grid-template-columns: 1fr 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; }
+      .menu-toggle { display: grid; place-items: center; }
+      .nav {
+        display: none; position: absolute; top: 72px; left: 0; right: 0;
+        background: #fff; border-bottom: 1px solid var(--line);
+        flex-direction: column; align-items: stretch; padding: 12px 20px 20px; gap: 4px;
+      }
+      .nav.open { display: flex; }
+      .nav a { padding: 12px 10px; }
+      .nav .btn { margin-top: 8px; width: 100%; }
+      .hero { padding: 48px 0 56px; }
+      .hero h1 { max-width: none; }
+      section { padding: 64px 0; }
+      .inuse-card, .form { padding: 24px; }
+      .fields { grid-template-columns: 1fr; }
+      .foot-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
+    @media (max-width: 620px) {
+      .mod-grid, .aud-grid, .steps { grid-template-columns: 1fr; }
+      .wrap { width: min(var(--max), calc(100% - 28px)); }
+      .header-inner { height: 64px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#conteudo">Ir para o conteúdo</a>
+
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#topo" aria-label="Med Prime, início">
+        <svg class="brand-mark" viewBox="0 0 36 36" aria-hidden="true">
+          <rect width="36" height="36" rx="9" fill="#0E7A72"/>
+          <rect x="16" y="8" width="4.2" height="20" rx="1.2" fill="#fff"/>
+          <rect x="8" y="16" width="20" height="4.2" rx="1.2" fill="#C67A2E"/>
+        </svg>
+        <span>
+          <span class="brand-name">Med <span>Prime</span></span>
+          <span class="brand-sub">Desenvolvido pela Med Prime</span>
+        </span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menu" id="menu-btn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <nav class="nav" id="menu">
+        <a href="#teste">Teste grátis</a>
+        <a href="#modulos">Módulos</a>
+        <a href="#telefonia">Telefonia</a>
+        <a href="#em-uso">Em uso</a>
+        <a href="#faq">Perguntas</a>
+        <a class="btn btn-primary btn-header" data-whatsapp-teste href="#contato">Solicitar ambiente de teste grátis</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <section class="hero" id="topo">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="hero-badge" role="status"><i aria-hidden="true"></i> Ambiente de teste sem custo</div>
+          <div class="eyebrow">Software de gestão para clínicas</div>
+          <h1>Gestão completa da clínica, com bot de telefone na agenda.</h1>
+          <p class="lead">A Med Prime desenvolveu um sistema que reúne cadastro de pacientes, fila de atendimento, exames e laudos digitais assinados — e um bot de telefone que atende as ligações e pode fazer o pré-agendamento direto no sistema. Já está em funcionamento em operação real, não é um protótipo.</p>
+          <div class="hero-actions">
+            <a class="btn btn-light" data-whatsapp-teste href="#contato">Solicitar ambiente de teste grátis</a>
+            <a class="btn btn-ghost" href="#contato">Agendar demonstração</a>
+          </div>
+          <p class="hero-note">Feito para clínicas de médio e grande porte, centros de diagnóstico e redes com mais de uma unidade. <a class="hero-text-link" href="#modulos">Ver o que o sistema faz</a>.</p>
+        </div>
+        <div class="hero-card" aria-hidden="true">
+          <div class="hero-card-top">
+            <div class="dots"><i></i><i></i><i></i></div>
+            <strong>Med Prime · agenda e fila</strong>
+          </div>
+          <div class="mock-tabs">
+            <span class="on">Agendas</span>
+            <span>Fila</span>
+            <span>Pacientes</span>
+            <span>Caixa</span>
+          </div>
+          <div class="mock-rows">
+            <div class="mock-row">
+              <span class="time">08:00</span>
+              <div><b>Consulta</b><small>Unidade · agenda configurada</small></div>
+              <span class="pill ok">Confirmada</span>
+            </div>
+            <div class="mock-row">
+              <span class="time">08:30</span>
+              <div><b>Exame</b><small>Pré-agendamento pelo bot de telefone</small></div>
+              <span class="pill">Bot</span>
+            </div>
+            <div class="mock-row">
+              <span class="time">09:00</span>
+              <div><b>Retorno</b><small>Horário livre oferecido na ligação</small></div>
+              <span class="pill warn">Aguardando</span>
+            </div>
+            <div class="mock-row">
+              <span class="time">09:30</span>
+              <div><b>Ordem de chegada</b><small>Bot informa o turno, sem marcar horário</small></div>
+              <span class="pill">Fila</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trial" id="teste">
+      <div class="wrap">
+        <div class="trial-card">
+          <div>
+            <div class="sec-kicker">Ambiente de teste sem custo</div>
+            <h2 class="sec-title">Teste o sistema que já está em funcionamento, sem custo.</h2>
+            <p class="sec-lead">A clínica pode solicitar um ambiente de teste para conhecer o software na prática — agenda, fila, prontuário, exames, laudos, caixa e telefonia. É o mesmo sistema já em operação real, não um protótipo, e não há cobrança para esse ambiente.</p>
+          </div>
+          <div class="trial-actions">
+            <a class="btn btn-primary" data-whatsapp-teste href="#contato">Solicitar ambiente de teste grátis</a>
+            <a class="btn btn-secondary" href="#contato">Agendar demonstração</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="problems" id="desafios">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="sec-kicker">O que o Med Prime resolve</div>
+          <h2 class="sec-title">A rotina que trava a recepção e o financeiro.</h2>
+          <p class="sec-lead">Clínicas médias e grandes perdem ligação, desorganizam a agenda entre unidades e refazem trabalho no faturamento de convênios. O sistema da Med Prime trata isso no mesmo software que já está em funcionamento — uma operação real, não um protótipo.</p>
+        </div>
+        <div class="problem-grid">
+          <article class="problem">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.35 1.9.66 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.31 1.85.53 2.81.66A2 2 0 0 1 22 16.92z"/></svg></div>
+            <h3>Fila no telefone e ligações perdidas</h3>
+            <p>Enquanto a recepção atende quem está no balcão, o telefone espera. O bot de telefone atende a ligação e, conforme a agenda, informa o horário ou já faz o pré-agendamento.</p>
+          </article>
+          <article class="problem">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+            <h3>Agenda desorganizada entre unidades</h3>
+            <p>Cada unidade, médico e tipo de atendimento tem regras próprias. O Med Prime centraliza as agendas, com horários, limites, feriados e preferências configuráveis.</p>
+          </article>
+          <article class="problem">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+            <h3>Faltas e confirmações manuais</h3>
+            <p>Confirmar e remarcar um a um ocupa a recepção e deixa furos na agenda. O atendente virtual apoia a confirmação e o reagendamento no fluxo da ligação.</p>
+          </article>
+          <article class="problem">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></div>
+            <h3>Retrabalho no faturamento de convênios</h3>
+            <p>Guias TISS (consulta e SP/SADT), convênios, tabelas de preço e fechamentos ficam no mesmo sistema — em vez de planilhas e retrabalho entre recepção e financeiro.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="modules" id="modulos">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="sec-kicker">Módulos de gestão</div>
+          <h2 class="sec-title">Tudo o que a operação usa no dia a dia, no mesmo lugar.</h2>
+          <p class="sec-lead">Os módulos abaixo existem no sistema em operação. A demonstração mostra cada tela no contexto da sua clínica.</p>
+        </div>
+        <div class="mod-grid">
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+            <h3>Agendas e unidades</h3>
+            <p>Agendas por unidade, com configuração de horários, limites, preferências e feriados. O médico acompanha a própria agenda em Minha Agenda.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
+            <h3>Fila, painel e telão</h3>
+            <p>Fila de atendimento, painel de filas, totem e telão com som e vídeo para chamar a senha. Templates de recepção e conferência de visitas apoiam o fluxo na porta.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+            <h3>Pacientes e prontuário</h3>
+            <p>Cadastro do paciente, prontuário eletrônico, documentos, observações, visitas, guias e pedidos, e o financeiro de cada conta — tudo no prontuário da pessoa.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z"/></svg></div>
+            <h3>Exames e laudos digitais</h3>
+            <p>Exames do dia, pendentes e carregamento de imagens (incluindo Orthanc/DICOM). Laudos com fluxo para escrever, assistente, assinatura digital e modelos.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 18h6"/></svg></div>
+            <h3>Portal do paciente</h3>
+            <p>O paciente consulta documentos e resultados com prontuário e CPF, sem precisar de cadastro. Também pode criar uma conta para passar a entrar com e-mail e senha.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+            <h3>Convênios, guias TISS e preços</h3>
+            <p>Cadastro de convênios, tabelas de preço, consulta de procedimentos e emissão de guias TISS de consulta e SP/SADT. Faturas acompanham o ciclo com as operadoras.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20M16 14h2"/></svg></div>
+            <h3>Caixa e fechamentos</h3>
+            <p>Caixa por unidade, com sessão, entradas, saídas, fila, histórico, supervisão e fechamento do período. Há recebimento de fechamentos e o repasse do dia.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <h3>Tesouraria e notas fiscais</h3>
+            <p>Contas a pagar e a receber da empresa, em controle separado do caixa das unidades. Acompanhamento das notas fiscais pedidas no caixa.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.75.75 0 0 1 6 2h8a.75.75 0 0 1 .75.75v18.5a.75.75 0 0 1-1.28.53L12 19l-1.47 2.78a.75.75 0 0 1-1.28-.53V2.75A.75.75 0 0 1 9.72 2"/><path d="M9 7h6M9 11h6"/></svg></div>
+            <h3>Repasse médico</h3>
+            <p>Relatório de exames realizados no período (particular e convênio) como base para o cálculo do repasse, além do acompanhamento do repasse do dia.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-8h6v8"/></svg></div>
+            <h3>Equipe, médicos e solicitantes</h3>
+            <p>Cadastro de médicos, solicitantes, usuários e permissões por papel — da recepção e do caixa à administração da rede de unidades.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>
+            <h3>Estoque</h3>
+            <p>Controle de estoque da clínica no mesmo sistema da operação, junto dos demais módulos de gestão.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-5"/><path d="M12 16V8"/><path d="M17 16v-9"/></svg></div>
+            <h3>Relatórios gerais</h3>
+            <p>Relatórios gerais da operação para acompanhar o que acontece no dia a dia da clínica, além dos relatórios já usados no repasse e no financeiro.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <h3>Recursos de LGPD</h3>
+            <p>Recursos de LGPD para apoiar o tratamento de dados pessoais dos pacientes no sistema.</p>
+          </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <h3>Atendimento por WhatsApp</h3>
+            <p>Atendimento por WhatsApp com o paciente, no mesmo software da gestão e da telefonia.</p>
+          </article>
+          <article class="mod mod-cta">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
+            <h3>Quer ver as telas na sua rotina?</h3>
+            <p>Solicite um ambiente de teste sem custo ou agende uma demonstração para percorrer os módulos com a rotina da sua clínica. <a href="#teste">Ambiente de teste sem custo</a> · <a href="#contato">Agendar demonstração</a>.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="phone" id="telefonia">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="sec-kicker">Telefonia com inteligência artificial</div>
+          <h2 class="sec-title">O bot de telefone atende a ligação e conversa com a agenda.</h2>
+          <p class="sec-lead">Cada agenda pode definir como o bot deve agir: só informar o horário de atendimento por ordem de chegada, ou oferecer os horários livres e fazer o pré-agendamento direto no Med Prime.</p>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <div class="step-num">1</div>
+            <h3>A ligação chega</h3>
+            <p>O bot de telefone atende a chamada da clínica, sem depender de a recepção estar livre no balcão.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">2</div>
+            <h3>Entende o que a pessoa precisa</h3>
+            <p>Agenda, confirma, remarca, tira dúvidas, faz a triagem da ligação e, quando necessário, transfere para um atendente humano.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">3</div>
+            <h3>Consulta a agenda real</h3>
+            <p>Usa as regras daquela agenda — horários livres, ordem de chegada, limites e feriados — em vez de uma lista solta.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">4</div>
+            <h3>Registra no sistema</h3>
+            <p>No modo de marcação, o pré-agendamento entra direto no Med Prime, visível para a recepção e para a unidade.</p>
+          </article>
+        </div>
+        <div class="phone-extras">
+          <article class="phone-extra">
+            <h3>Integração direta com a agenda</h3>
+            <p>A configuração do bot fica na própria agenda: o mesmo lugar em que a clínica define duração dos horários, janela de marcação e bloqueio de feriados nacionais.</p>
+          </article>
+          <article class="phone-extra">
+            <h3>Horário de atendimento das ligações</h3>
+            <p>O bot atende as ligações 24 horas, todos os dias.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="audience" id="para-quem">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="sec-kicker">Para quem é</div>
+          <h2 class="sec-title">Clínicas que já não cabem em um sistema simples de agenda.</h2>
+          <p class="sec-lead">O Med Prime foi pensado para operações com volume, mais de uma unidade e um fluxo clínico que vai além da consulta isolada.</p>
+        </div>
+        <div class="aud-grid">
+          <article class="aud">
+            <h3>Clínicas de médio e grande porte</h3>
+            <p>Recepção, caixa, médicos e financeiro no mesmo sistema, com papéis e permissões para cada equipe.</p>
+          </article>
+          <article class="aud">
+            <h3>Centros de diagnóstico</h3>
+            <p>Exames do dia, imagens, laudos digitais assinados e portal para o paciente consultar o resultado.</p>
+          </article>
+          <article class="aud">
+            <h3>Redes com várias unidades</h3>
+            <p>Cadastro de unidades, agendas por local, caixa de cada unidade e tesouraria da empresa em controle separado.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="inuse" id="em-uso">
+      <div class="wrap">
+        <div class="inuse-card">
+          <div class="inuse-map">
+            <div class="pin">
+              <span class="dot alt"></span>
+              <div><strong>Rede multiunidade</strong><span>Agenda e caixa por local</span></div>
+            </div>
+            <div class="pin">
+              <span class="dot"></span>
+              <div><strong>Atendimento</strong><span>Fila, recepção e bot de telefone</span></div>
+            </div>
+            <div class="pin">
+              <span class="dot"></span>
+              <div><strong>Área clínica e financeiro</strong><span>Prontuário, exames, laudos e tesouraria</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="sec-kicker">Já em operação</div>
+            <h2>O sistema já está em funcionamento, no dia a dia de uma clínica multiunidade.</h2>
+            <p>Este não é um protótipo. O software desenvolvido pela Med Prime já roda em operação real, em uma clínica com mais de uma unidade. A oferta a outras clínicas parte desse uso cotidiano — agenda, fila, exames, laudos, caixa e atendimento — e não de um sistema pensado à distância da prática.</p>
+            <p class="inuse-foot">Esta seção descreve o contexto de uso. Não é um depoimento e não apresenta resultados numéricos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq" id="faq">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="sec-kicker">Perguntas frequentes</div>
+          <h2 class="sec-title">Antes de começar.</h2>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>Posso testar o sistema sem custo?</summary>
+            <div class="faq-a"><p>Sim. A clínica pode solicitar um ambiente de teste sem custo para conhecer o software que já está em funcionamento. Se preferir, também é possível agendar uma demonstração.</p></div>
+          </details>
+          <details>
+            <summary>O Med Prime substitui o sistema que já usamos?</summary>
+            <div class="faq-a"><p>Depende do que a clínica usa hoje e do que precisa manter. Na demonstração mapeamos agenda, prontuário, fila, exames, laudos e financeiro para avaliar a substituição ou a convivência. Os dados do sistema antigo são migrados, sem custo.</p></div>
+          </details>
+          <details>
+            <summary>A IA substitui a recepção?</summary>
+            <div class="faq-a"><p>Não. O bot de telefone atende a ligação, faz o pré-agendamento quando a agenda está configurada para isso e transfere para um atendente humano quando a situação pede. A recepção continua no balcão, na fila e nas exceções.</p></div>
+          </details>
+          <details>
+            <summary>O bot funciona com a agenda da clínica?</summary>
+            <div class="faq-a"><p>Sim. A integração é direta: cada agenda define se o bot apenas informa o atendimento por ordem de chegada ou se oferece horários livres e grava o pré-agendamento no sistema.</p></div>
+          </details>
+          <details>
+            <summary>A telefonia com IA atende em que horário?</summary>
+            <div class="faq-a"><p>A telefonia com inteligência artificial atende 24 horas, todos os dias.</p></div>
+          </details>
+          <details>
+            <summary>Dá para usar em mais de uma unidade?</summary>
+            <div class="faq-a"><p>Sim. O Med Prime tem cadastro de unidades, agendas por local e caixa de cada unidade, com a tesouraria da empresa em um controle separado.</p></div>
+          </details>
+          <details>
+            <summary>O sistema emite guias TISS e trata convênio?</summary>
+            <div class="faq-a"><p>Sim. Há cadastro de convênios, tabelas de preço, consulta de procedimentos e guias TISS de consulta e SP/SADT, além do acompanhamento de faturas.</p></div>
+          </details>
+          <details>
+            <summary>O paciente consegue ver documentos e resultados?</summary>
+            <div class="faq-a"><p>Sim. No portal do paciente, a pessoa acessa documentos com o número do prontuário e o CPF, sem cadastro. Também pode criar uma conta para entrar com e-mail e senha, e há uma jornada específica para consultar o resultado.</p></div>
+          </details>
+          <details>
+            <summary>Os laudos são digitais e assinados?</summary>
+            <div class="faq-a"><p>Sim. O fluxo de laudos inclui escrita, apoio da assistente, assinatura e modelos. Exames de imagem podem ser carregados, com suporte a Orthanc/DICOM.</p></div>
+          </details>
+          <details>
+            <summary>Quanto custa?</summary>
+            <div class="faq-a"><p>O preço é sob consulta pelo WhatsApp. O valor depende do porte da clínica, do número de unidades e dos módulos utilizados. <a href="https://wa.me/5511979760006?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20uma%20proposta%20comercial%20do%20Med%20Prime." target="_blank" rel="noopener">Peça uma proposta no WhatsApp (11) 97976-0006</a>.</p></div>
+          </details>
+          <details>
+            <summary>Como é a implantação?</summary>
+            <div class="faq-a"><p>A implantação é feita em até 30 dias. O caminho é apresentado na demonstração, com as unidades, usuários e agendas da clínica.</p></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta" id="contato">
+      <div class="wrap cta-grid">
+        <div>
+          <div class="sec-kicker cta-kicker">Ambiente de teste sem custo</div>
+          <h2 class="sec-title">Solicite um ambiente de teste grátis.</h2>
+          <p>Conte um pouco da operação — porte, número de unidades e o que mais aperta hoje no telefone, na agenda ou no faturamento. Os dois botões abrem uma conversa direto no WhatsApp: um para o ambiente de teste, outro para agendar uma demonstração.</p>
+          <p>Desenvolvido pela Med Prime.</p>
+          <p>WhatsApp: <strong><a href="https://wa.me/5511979760006" target="_blank" rel="noopener">(11) 97976-0006</a></strong></p>
+        </div>
+        <form class="form" id="form-demo" action="#" method="post" novalidate>
+          <h3>Solicitar ambiente de teste grátis</h3>
+          <p class="hint">Campos obrigatórios. Os dois botões abrem o WhatsApp com uma mensagem pronta.</p>
+          <div class="fields">
+            <div class="field">
+              <label for="nome">Nome</label>
+              <input id="nome" name="nome" type="text" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="clinica">Clínica</label>
+              <input id="clinica" name="clinica" type="text" autocomplete="organization" required>
+            </div>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="telefone">Telefone</label>
+              <input id="telefone" name="telefone" type="tel" autocomplete="tel" required>
+            </div>
+            <div class="field full">
+              <label for="unidades">Nº de unidades</label>
+              <select id="unidades" name="unidades" required>
+                <option value="">Selecione</option>
+                <option value="1">1 unidade</option>
+                <option value="2">2 unidades</option>
+                <option value="3">3 unidades</option>
+                <option value="4-mais">4 ou mais unidades</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit" name="intent" value="teste">Solicitar ambiente de teste grátis</button>
+          <button class="btn btn-secondary" type="submit" name="intent" value="demo">Agendar demonstração</button>
+          <div class="thanks" id="obrigado" role="status" aria-live="polite">
+            <div class="thanks-ico" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <h3>Obrigado pelo interesse.</h3>
+            <p id="obrigado-texto">Recebemos as informações. Se o WhatsApp não abriu, use o botão novamente ou fale pelos canais ao lado.</p>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div>
+          <a class="brand" href="#topo" aria-label="Med Prime">
+            <svg class="brand-mark" viewBox="0 0 36 36" aria-hidden="true">
+              <rect width="36" height="36" rx="9" fill="#0E7A72"/>
+              <rect x="16" y="8" width="4.2" height="20" rx="1.2" fill="#fff"/>
+              <rect x="8" y="16" width="20" height="4.2" rx="1.2" fill="#C67A2E"/>
+            </svg>
+            <span>
+              <span class="brand-name">Med <span>Prime</span></span>
+              <span class="brand-sub">Desenvolvido pela Med Prime</span>
+            </span>
+          </a>
+          <p style="margin-top:16px">Software de gestão para clínicas de médio e grande porte, com telefonia por inteligência artificial.</p>
+          <p><strong>Desenvolvido pela Med Prime.</strong></p>
+        </div>
+        <div>
+          <h4>Contato</h4>
+          <ul>
+            <li>WhatsApp: <a href="https://wa.me/5511979760006" target="_blank" rel="noopener">(11) 97976-0006</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="legal">
+        <span>© <span id="ano">2026</span> Med Prime. Desenvolvido pela Med Prime.</span>
+        <span>Página de apresentação comercial.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      // Troque pelo número real no WhatsApp (DDI + DDD + número, somente dígitos).
+      var WHATSAPP_NUMERO = "5511979760006";
+
+      function mensagemTeste(dados) {
+        var partes = ["Olá! Quero solicitar o ambiente de teste grátis do Med Prime."];
+        if (dados) {
+          if (dados.clinica) partes.push("Clínica: " + dados.clinica);
+          if (dados.nome) partes.push("Nome: " + dados.nome);
+          if (dados.unidades) partes.push("Unidades: " + dados.unidades);
+          if (dados.email) partes.push("E-mail: " + dados.email);
+          if (dados.telefone) partes.push("Telefone: " + dados.telefone);
+        }
+        return partes.join(" ");
+      }
+
+      function urlWhatsApp(texto) {
+        return "https://wa.me/" + WHATSAPP_NUMERO + "?text=" + encodeURIComponent(texto);
+      }
+
+      function abrirWhatsAppTeste(dados) {
+        window.open(urlWhatsApp(mensagemTeste(dados)), "_blank", "noopener");
+      }
+
+      document.querySelectorAll("[data-whatsapp-teste]").forEach(function (el) {
+        el.setAttribute("href", urlWhatsApp(mensagemTeste(null)));
+        el.setAttribute("target", "_blank");
+        el.setAttribute("rel", "noopener");
+      });
+
+      var btn = document.getElementById("menu-btn");
+      var menu = document.getElementById("menu");
+      if (btn && menu) {
+        btn.addEventListener("click", function () {
+          var open = menu.classList.toggle("open");
+          btn.setAttribute("aria-expanded", open ? "true" : "false");
+          btn.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
+        });
+        menu.querySelectorAll("a").forEach(function (link) {
+          link.addEventListener("click", function () {
+            menu.classList.remove("open");
+            btn.setAttribute("aria-expanded", "false");
+            btn.setAttribute("aria-label", "Abrir menu");
+          });
+        });
+      }
+
+      var form = document.getElementById("form-demo");
+      var thanks = document.getElementById("obrigado");
+      var thanksText = document.getElementById("obrigado-texto");
+      if (form && thanks) {
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          if (!form.reportValidity()) return;
+          var intent = (e.submitter && e.submitter.value) || "teste";
+          if (intent === "teste") {
+            abrirWhatsAppTeste({
+              nome: (form.nome.value || "").trim(),
+              clinica: (form.clinica.value || "").trim(),
+              email: (form.email.value || "").trim(),
+              telefone: (form.telefone.value || "").trim(),
+              unidades: (form.unidades.options[form.unidades.selectedIndex] || {}).text || (form.unidades.value || "").trim()
+            });
+            if (thanksText) thanksText.textContent = "Se o WhatsApp não abriu, use o botão novamente ou chame no (11) 97976-0006. Em breve a equipe da Med Prime retorna sobre o ambiente de teste.";
+          } else {
+            var d = ["Olá! Quero agendar uma demonstração do Med Prime."];
+            if (form.clinica.value.trim()) d.push("Clínica: " + form.clinica.value.trim());
+            if (form.nome.value.trim()) d.push("Nome: " + form.nome.value.trim());
+            window.open(urlWhatsApp(d.join(" ")), "_blank", "noopener");
+            if (thanksText) thanksText.textContent = "Se o WhatsApp não abriu, use o botão novamente ou chame no (11) 97976-0006.";
+          }
+          form.classList.add("sent");
+          thanks.classList.add("show");
+        });
+      }
+
+      var ano = document.getElementById("ano");
+      if (ano) ano.textContent = String(new Date().getFullYear());
+    })();
+  </script>
+</body>
+</html>
