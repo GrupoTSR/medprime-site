@@ -380,7 +380,7 @@
     // Se a pergunta trouxe dois temas fortes (ex.: "telefonia e preço"), junta as duas respostas.
     var extra = null, seg = c.ranking[1];
     if (!it.acao && seg && !seg.intent.acao && seg.score >= 2 && seg.score >= top.score * 0.75 &&
-        it.id !== "saudacao" && seg.intent.id !== "saudacao" && seg.intent.id !== "agradecimento" && it.id !== "agradecimento") {
+        it.id !== "saudacao" && it.id !== "site_clinica" && it.id !== "recursos" && seg.intent.id !== "saudacao" && seg.intent.id !== "agradecimento" && it.id !== "agradecimento") {
       extra = seg.intent;
     }
     return {
