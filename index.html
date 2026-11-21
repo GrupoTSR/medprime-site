@@ -6,7 +6,7 @@
   <meta name="description" content="A Med Prime desenvolve software de gestão para clínicas de médio e grande porte, com bot de telefone integrado à agenda, prontuário, fila, exames, laudos digitais e faturamento. Sistema já em funcionamento, com ambiente de teste sem custo.">
   <title>Med Prime — Gestão para clínicas com telefonia por IA</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230E7A72'/%3E%3Crect x='14' y='7' width='4' height='18' rx='1' fill='white'/%3E%3Crect x='7' y='14' width='18' height='4' rx='1' fill='white'/%3E%3Crect x='7' y='14' width='18' height='4' rx='1' fill='%23C67A2E' fill-opacity='0.95'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/chat.css?v=2">
+  <link rel="stylesheet" href="assets/chat.css?v=3">
   <style>
     :root {
       --blue: #0E7A72;
@@ -235,7 +235,7 @@
     }
     .mod h3 { font-size: 1.05rem; margin-bottom: 8px; }
     .mod p { color: var(--ink-2); font-size: 14.5px; margin: 0; }
-    .mod-cta { background: var(--blue-mist); border-color: var(--blue-soft); }
+    .mod-cta { background: var(--blue-mist); border-color: var(--blue-soft); grid-column: 1 / -1; }
     .mod-note {
       margin-top: 28px; font-size: 13.5px; color: var(--muted);
       border-left: 3px solid var(--blue-soft); padding-left: 14px;
@@ -380,6 +380,43 @@
       display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between;
     }
 
+    /* Site da clínica integrado */
+    .site { background: var(--paper); }
+    .site-card {
+      display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center;
+      background: linear-gradient(180deg, var(--blue-mist), #fff 70%);
+      border: 1px solid var(--blue-soft); border-radius: 24px; padding: 40px;
+    }
+    .site-badge {
+      display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px;
+      font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--red-deep); background: #FFF3E6; border: 1px solid #F1D3B2;
+      padding: 6px 12px; border-radius: 999px;
+    }
+    .site-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--red); }
+    .site-list { list-style: none; padding: 0; margin: 22px 0 26px; display: grid; gap: 14px; }
+    .site-list li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; }
+    .site-list .ck {
+      width: 28px; height: 28px; border-radius: 8px; background: var(--blue); color: #fff;
+      display: grid; place-items: center;
+    }
+    .site-list b { display: block; color: var(--ink); font-size: 15.5px; margin-bottom: 2px; }
+    .site-list span { color: var(--ink-2); font-size: 14.5px; }
+    .site-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .site-note { font-size: 13.5px; color: var(--muted); margin: 14px 0 0; }
+    .site-mock { background: #fff; border-radius: 20px; box-shadow: var(--shadow-lg); padding: 20px; border: 1px solid var(--line); }
+    .site-mock .mock-row { grid-template-columns: 1fr auto; }
+    .site-bubble { background: var(--bg); border: 1px solid var(--line); border-radius: 14px 14px 14px 4px; padding: 10px 12px; font-size: 13.5px; color: var(--ink-2); margin-bottom: 12px; }
+    .site-bubble strong { color: var(--ink); }
+    .site-senha {
+      margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--blue-ink); color: #fff; border-radius: 14px; padding: 12px 14px;
+    }
+    .site-senha small { display: block; color: #C9DCDA; font-size: 12px; }
+    .site-senha b { font-size: 1.35rem; letter-spacing: .02em; }
+    @media (max-width: 920px) { .site-card { grid-template-columns: 1fr; padding: 28px; } }
+    @media (max-width: 620px) { .site-card { padding: 22px; gap: 28px; } }
+
     /* Mobile nav */
     @media (max-width: 920px) {
       .hero-grid, .cta-grid, .inuse-card, .phone-extras, .problem-grid, .trial-card { grid-template-columns: 1fr; }
@@ -430,6 +467,7 @@
       <nav class="nav" id="menu">
         <a href="#teste">Teste grátis</a>
         <a href="#modulos">Módulos</a>
+        <a href="#site">Site da clínica</a>
         <a href="#telefonia">Telefonia</a>
         <a href="#em-uso">Em uso</a>
         <a href="#faq">Perguntas</a>
@@ -615,11 +653,53 @@
             <h3>Atendimento por WhatsApp</h3>
             <p>Atendimento por WhatsApp com o paciente, no mesmo software da gestão e da telefonia.</p>
           </article>
+          <article class="mod">
+            <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+            <h3>Site da clínica integrado</h3>
+            <p>Site com agendamento online na agenda real e assistente de IA que abre a ficha do paciente antes da consulta. <a href="#site">Ver como funciona</a>.</p>
+          </article>
           <article class="mod mod-cta">
             <div class="ico" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
             <h3>Quer ver as telas na sua rotina?</h3>
             <p>Solicite um ambiente de teste sem custo ou agende uma demonstração para percorrer os módulos com a rotina da sua clínica. <a href="#teste">Ambiente de teste sem custo</a> · <a href="#contato">Agendar demonstração</a>.</p>
           </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="site" id="site">
+      <div class="wrap">
+        <div class="site-card">
+          <div>
+            <div class="site-badge">Novo no portfólio</div>
+            <div class="sec-kicker">Site da clínica integrado ao Med Prime</div>
+            <h2 class="sec-title">Site com agenda online e assistente de IA que abre a ficha do paciente.</h2>
+            <p class="sec-lead">A Med Prime entrega um site para a clínica ligado ao sistema: o paciente agenda online nos horários livres da agenda e é guiado por um assistente de IA que já faz a abertura da ficha antes do atendimento.</p>
+            <ul class="site-list">
+              <li><span class="ck" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Agendamento online na agenda real</b><span>O paciente vê os horários livres da própria agenda da clínica, com as mesmas regras, limites e feriados, e a marcação entra direto no Med Prime.</span></div></li>
+              <li><span class="ck" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Assistente de IA abre a ficha</b><span>Antes da consulta, o assistente coleta dados pessoais, convênio e motivo da consulta. A ficha chega pronta no sistema, sem redigitar no balcão.</span></div></li>
+              <li><span class="ck" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Consentimento LGPD do paciente</b><span>O paciente autoriza o uso dos seus dados no próprio fluxo, antes do envio, apoiado pelos recursos de LGPD do sistema.</span></div></li>
+              <li><span class="ck" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Senha acompanhada pelo celular</b><span>O paciente recebe um link e acompanha a senha da fila no navegador do celular, sem instalar aplicativo. O link também pode chegar pelo WhatsApp.</span></div></li>
+              <li><span class="ck" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><div><b>Menos trabalho na recepção e menos fila</b><span>Com o cadastro feito antes, a recepção confere em vez de preencher, e o paciente espera menos no balcão.</span></div></li>
+            </ul>
+            <div class="site-actions">
+              <a class="btn btn-primary" href="https://wa.me/5511979760006?text=Ol%C3%A1%21%20Tenho%20interesse%20no%20site%20da%20cl%C3%ADnica%20integrado%20ao%20Med%20Prime%2C%20com%20agendamento%20online%20e%20assistente%20de%20IA%20para%20abertura%20da%20ficha." target="_blank" rel="noopener">Quero o site integrado</a>
+              <a class="btn btn-secondary" href="#contato">Agendar demonstração</a>
+            </div>
+            <p class="site-note">Preço sob consulta pelo WhatsApp (11) 97976-0006.</p>
+          </div>
+          <div class="site-mock" role="img" aria-label="Exemplo do site da clínica: o paciente escolhe o horário, o assistente de IA abre a ficha e a senha é acompanhada por um link no celular">
+            <div class="hero-card-top"><div class="dots"><i></i><i></i><i></i></div><strong>Site da clínica · agendar e abrir ficha</strong></div>
+            <div class="site-bubble"><strong>Assistente:</strong> Horário reservado. Agora vou abrir a sua ficha para agilizar o atendimento.</div>
+            <div class="mock-rows">
+              <div class="mock-row"><div><b>Horário escolhido</b><small>Agenda da clínica · horário livre</small></div><span class="pill ok">Agendado</span></div>
+              <div class="mock-row"><div><b>Dados pessoais</b><small>Nome, documento e contato</small></div><span class="pill ok">Preenchido</span></div>
+              <div class="mock-row"><div><b>Convênio</b><small>Operadora e carteirinha</small></div><span class="pill ok">Preenchido</span></div>
+              <div class="mock-row"><div><b>Motivo da consulta</b><small>Informado pelo paciente</small></div><span class="pill ok">Preenchido</span></div>
+              <div class="mock-row"><div><b>Consentimento LGPD</b><small>Autorização do paciente</small></div><span class="pill">Aceito</span></div>
+            </div>
+            <div class="site-senha"><div><small>Acompanhe pelo link no celular</small><b>Senha A-012</b></div><span class="pill warn">Ficha pronta no Med Prime</span></div>
+          </div>
         </div>
       </div>
     </section>
@@ -939,7 +1019,7 @@
       if (ano) ano.textContent = String(new Date().getFullYear());
     })();
   </script>
-  <script src="assets/chat-engine.js?v=2" defer></script>
-  <script src="assets/chat.js?v=2" defer></script>
+  <script src="assets/chat-engine.js?v=3" defer></script>
+  <script src="assets/chat.js?v=3" defer></script>
 </body>
 </html>

@@ -209,7 +209,7 @@
     responderPergunta(v);
   }
 
-  var SUGESTOES_INICIAIS = ["Como funciona a telefonia IA?", "Quais recursos?", "Quanto custa?", "Teste grátis", "Agendar contato",
+  var SUGESTOES_INICIAIS = ["Como funciona a telefonia IA?", "Site com agendamento online", "Quais recursos?", "Quanto custa?", "Teste grátis", "Agendar contato",
     { label: "Falar no WhatsApp", value: "Falar no WhatsApp", cls: "wa" }];
 
   function saudar() {
@@ -220,7 +220,7 @@
 
   /* ---------- Fluxo de agendamento ---------- */
   var PORTES = ["Até 5 profissionais", "6 a 15 profissionais", "16 a 40 profissionais", "Mais de 40 profissionais", "Rede com várias unidades"];
-  var INTERESSES = ["Telefonia com IA", "Gestão completa da clínica", "Atendimento por WhatsApp", "Agenda e fila", "Prontuário, exames e laudos", "Convênios e TISS", "Financeiro e caixa", "Ambiente de teste grátis"];
+  var INTERESSES = ["Telefonia com IA", "Gestão completa da clínica", "Atendimento por WhatsApp", "Agenda e fila", "Site da clínica integrado", "Prontuário, exames e laudos", "Convênios e TISS", "Financeiro e caixa", "Ambiente de teste grátis"];
   var PERIODOS = [
     { label: "Manhã (08h às 12h)", value: "manha" },
     { label: "Tarde (13h às 18h)", value: "tarde" },

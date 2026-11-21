@@ -129,8 +129,8 @@
     },
     {
       id: "prontuario", label: "Prontuário",
-      frases: ["prontuario eletronico", "cadastro de paciente", "cadastro do paciente", "historico do paciente", "ficha do paciente"],
-      chaves: ["prontuario", "prontuarios", "pep", "ficha", "anamnese", "paciente", "pacientes", "documentos", "pedidos"],
+      frases: ["prontuario eletronico", "cadastro de paciente", "cadastro do paciente", "historico do paciente"],
+      chaves: ["prontuario", "prontuarios", "pep", "anamnese", "paciente", "pacientes", "documentos", "pedidos"],
       resposta: "Sim, o Med Prime tem prontuário eletrônico. No prontuário da pessoa ficam o cadastro do paciente, documentos, observações, visitas, guias e pedidos, e o financeiro de cada conta.",
       sugestoes: ["Portal do paciente", "Exames e laudos", "Agendar contato"]
     },
@@ -219,10 +219,38 @@
       sugestoes: ["Agendar contato", "Teste grátis"]
     },
     {
+      id: "site_clinica", label: "Site da clínica integrado",
+      frases: ["site da clinica", "site para clinica", "site para a clinica", "site integrado", "site com agenda", "site com agendamento", "criar site", "fazer site", "pagina da clinica", "site proprio", "site integrado com agenda", "integracao com a agenda da clinica", "integracao com a agenda", "integracao com agenda", "integrado com a agenda", "integrado a agenda", "integrado com o sistema"],
+      chaves: ["site", "sites", "website", "pagina", "landing"],
+      resposta: "Novo no portfólio: a Med Prime entrega um site para a clínica integrado ao sistema.\n• Agendamento online na agenda real: o paciente vê os horários livres, com as regras, limites e feriados da agenda, e a marcação entra direto no Med Prime.\n• Assistente de IA que abre a ficha: coleta dados pessoais, convênio e motivo da consulta antes do atendimento, e a ficha chega pronta no sistema.\n• Consentimento LGPD do paciente no próprio fluxo.\n• Senha acompanhada pelo celular, por um link aberto no navegador, sem aplicativo.\n• Menos trabalho na recepção e menos fila.\nO preço é sob consulta pelo WhatsApp.",
+      sugestoes: ["Como funciona a abertura da ficha?", "Acompanhar a senha pelo celular", "Agendar contato"]
+    },
+    {
+      id: "agendamento_online", label: "Agendamento online",
+      frases: ["agendamento online", "agendar online", "agendar pela internet", "marcar online", "marcacao online", "agendamento pela internet", "agendamento pelo site", "agendar pelo site", "marcar pelo site", "paciente agendar sozinho", "paciente marcar sozinho", "agenda online"],
+      chaves: ["online", "internet", "autoagendamento"],
+      resposta: "Sim. No site da clínica integrado ao Med Prime, o paciente agenda online nos horários livres da agenda real da clínica, com as mesmas regras, limites e feriados configurados no sistema. A marcação entra direto no Med Prime, visível para a recepção. Em seguida, o assistente de IA já faz a abertura da ficha.",
+      sugestoes: ["Como funciona a abertura da ficha?", "Site da clínica", "Agendar contato"]
+    },
+    {
+      id: "ficha_paciente", label: "Abertura da ficha",
+      frases: ["abertura da ficha", "abrir a ficha", "abrir ficha", "ficha do paciente", "fixa do paciente", "ficha pronta", "cadastro antes da consulta", "pre cadastro", "preencher cadastro", "preencher a ficha", "dados do convenio", "motivo da consulta", "como funciona a abertura da ficha"],
+      chaves: ["ficha", "fichas", "fixa", "precadastro", "cadastro", "cadastrar", "formulario", "carteirinha", "motivo"],
+      resposta: "No site da clínica, um assistente de IA ajuda o paciente a abrir a ficha antes da consulta: coleta dados pessoais, convênio e motivo da consulta, e pede o consentimento LGPD para o uso desses dados. A ficha chega pronta no Med Prime, então a recepção confere em vez de digitar, e o paciente espera menos no balcão.",
+      sugestoes: ["Acompanhar a senha pelo celular", "LGPD", "Agendar contato"]
+    },
+    {
+      id: "senha_celular", label: "Senha pelo celular",
+      frases: ["senha pelo celular", "senha no celular", "acompanhar a senha", "acompanhar senha", "acompanhar a fila", "acompanhar pelo celular", "ver a senha", "minha vez", "sem aplicativo", "precisa de aplicativo", "precisa baixar"],
+      chaves: ["celular", "smartphone", "aplicativo", "app", "link", "notificacao", "notificacoes", "aviso"],
+      resposta: "O paciente acompanha a senha da fila pelo celular, por um link que abre no navegador, sem precisar instalar aplicativo. Esse link também pode chegar pelo WhatsApp. Assim ele não precisa ficar parado olhando o painel da recepção.",
+      sugestoes: ["Site da clínica", "Fila e painel", "Agendar contato"]
+    },
+    {
       id: "recursos", label: "Recursos",
       frases: ["o que o sistema faz", "o que faz", "quais recursos", "quais modulos", "quais funcionalidades", "o que tem", "como funciona o sistema", "o que e o med prime"],
       chaves: ["recursos", "recurso", "modulos", "modulo", "funcionalidades", "funcionalidade", "funcoes", "ferramentas", "faz", "oferece", "software"],
-      resposta: "O Med Prime reúne, no mesmo sistema:\n• Telefonia com IA (24h, todos os dias), integrada à agenda\n• Atendimento por WhatsApp com o paciente\n• Agendas e unidades\n• Fila, painel, totem e telão\n• Pacientes e prontuário eletrônico\n• Exames e laudos digitais assinados (Orthanc/DICOM)\n• Portal do paciente\n• Convênios, guias TISS e tabelas de preço\n• Caixa, fechamentos, tesouraria e notas fiscais\n• Repasse médico\n• Equipe e permissões\n• Estoque\n• Relatórios gerais\n• Recursos de LGPD\nQuer que eu explique algum deles?",
+      resposta: "O Med Prime reúne, no mesmo sistema:\n• Telefonia com IA (24h, todos os dias), integrada à agenda\n• Atendimento por WhatsApp com o paciente\n• Agendas e unidades\n• Fila, painel, totem e telão\n• Pacientes e prontuário eletrônico\n• Exames e laudos digitais assinados (Orthanc/DICOM)\n• Portal do paciente\n• Site da clínica integrado: agendamento online e assistente de IA que abre a ficha\n• Convênios, guias TISS e tabelas de preço\n• Caixa, fechamentos, tesouraria e notas fiscais\n• Repasse médico\n• Equipe e permissões\n• Estoque\n• Relatórios gerais\n• Recursos de LGPD\nQuer que eu explique algum deles?",
       sugestoes: ["Como funciona a telefonia IA?", "Prontuário", "Convênios e TISS", "Agendar contato"]
     },
     {
@@ -255,7 +283,7 @@
     },
     {
       id: "integracao", label: "Integrações",
-      frases: ["integra com", "integracao com", "outros sistemas", "api"],
+      frases: ["integra com outro", "integra com outros", "integracao com outro", "integracao com outros", "outros sistemas", "outro sistema", "api"],
       chaves: ["integracao", "integracoes", "integrar", "integra", "api", "sistemas"],
       resposta: "No site, as integrações descritas são a integração direta do bot de telefone com a agenda e o carregamento de imagens de exames com suporte a Orthanc/DICOM. Para outra integração específica, é melhor confirmar com a equipe no WhatsApp.",
       sugestoes: ["Falar no WhatsApp", "Agendar contato"]
